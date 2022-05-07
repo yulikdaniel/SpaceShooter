@@ -13,8 +13,7 @@ void setNewComment(const std::string& comment) {
     commentStartTime.restart();
 }
 
-int current = -1;
-float scale = 0.25, showScale, bigScale;
+float showScale, bigScale;
 
 class AddAction { // Static class used as action for Add new convex button
     static std::shared_ptr<Info<sf::Text>> toUpd;
@@ -28,7 +27,7 @@ class AddAction { // Static class used as action for Add new convex button
         }
 
         setNewComment("Adding new convex");
-        current = model.getConvexes().size(); // Create new empty convex and update its parameters
+        model.switchCurrent(model.getConvexes().size()); // Create new empty convex and update its parameters
         model.getConvexes().emplace_back();
         model.getConvexes().back().setScale(showScale, showScale);
         model.getConvexes().back().setFillColor(sf::Color::Transparent);
@@ -46,12 +45,12 @@ class RemoveAction { // Static class used as action for Remove convex button
     friend int main();
   public:
     static void call() {
-        if (current == -1) {
+        if (model.getCurrent() == -1) {
             setNewComment("No convex chosen to erase");
         } else {
             setNewComment("Removing current convex");
-            model.getConvexes().erase(model.getConvexes().begin() + current);
-            current = -1;
+            model.getConvexes().erase(model.getConvexes().begin() + model.getCurrent());
+            model.switchCurrent(-1);
         }
         toUpd -> view = makeText("Number of convexes: " + std::to_string(model.getConvexes().size())); // Update menu info
     }
@@ -63,7 +62,7 @@ class FinishAction { // Static class used as action for Done button
   public:
     static void call() {
         setNewComment("Done with current convex");
-        current = -1;
+        model.switchCurrent(-1);
     }
 };
 
@@ -94,12 +93,12 @@ class SwitchScaleAction {
 
     static void update() {
         if (currentReal) {
-            showScale = scale;
+            showScale = model.getRealScale();
         } else {
             showScale = bigScale;
         }
-        model.setScale(showScale);
-        textToUpd -> view = makeText("Current scale: " + std::to_string(static_cast<int>(std::round(100 * scale))) + "%");
+        model.setShowScale(showScale);
+        textToUpd -> view = makeText("Current scale: " + std::to_string(static_cast<int>(std::round(100 * model.getRealScale()))) + "%");
         buttonToUpd -> normalView = makeText(currentReal ? "Switch to amplified scale" : "Switch to real scale", sf::Color::Blue);
         buttonToUpd -> highlightedView = makeText(currentReal ? "Switch to amplified scale" : "Switch to real scale", sf::Color::Green);
     }
@@ -146,11 +145,12 @@ int main() {
     addDefaultTextButton<FinishAction>(menu, "Done", 0, 80);
     addDefaultTextButton<SaveAction>(menu, "Save", 0, 120);
     SwitchScaleAction::buttonToUpd = addDefaultTextButton<SwitchScaleAction>(menu, "Switch to real scale", 0, 160);
-    AddAction::toUpd = addDefaultText(menu, "Numer of convexes: " + std::to_string(model.getConvexes().size()), 0, 200);
+
+    AddAction::toUpd = addDefaultText(menu, "Numer of convexes: " + std::to_string(model.getConvexes().size()), 0, 600);
     RemoveAction::toUpd = AddAction::toUpd;
 
-    SwitchScaleAction::textToUpd = addDefaultText(menu, "", 0, 240);
-    SwitchScaleAction::currentReal = false;
+    SwitchScaleAction::textToUpd = addDefaultText(menu, "", 0, 640);
+    SwitchScaleAction::currentReal = true;
     SwitchScaleAction::update();
 
     setNewComment("Starting up");
@@ -170,7 +170,7 @@ int main() {
             if (event.type == sf::Event::MouseButtonPressed) {
                 menu.onClick();
 
-                if (current != -1 && !menu.getHighlighted() && !model.getConvexes().empty()) {
+                if (model.getCurrent() != -1 && !menu.getHighlighted() && !model.getConvexes().empty()) {
                     model.getConvexes().back().setPointCount(model.getConvexes().back().getPointCount() + 1);
                     model.getConvexes().back().setPoint(model.getConvexes().back().getPointCount() - 1, static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)) / showScale);
                 }
@@ -178,27 +178,25 @@ int main() {
             if (event.type == sf::Event::KeyPressed) {
                 for (int i = 0; i < 10; ++i) {
                     if (event.key.code == sf::Keyboard::Num0 + i) {
-                        if (i == current) {
+                        if (i == model.getCurrent()) {
                             setNewComment("Staying in convex #" + std::to_string(i));
                         } else {
                             if (i >= model.getConvexes().size()) {
                                 setNewComment("Convex index out of range");
                             } else {
                                 setNewComment("Switching to convex #" + std::to_string(i));
-                                current = i;
+                                model.switchCurrent(i);
                             }
                         }
                         break;
                     }
                 }
                 if (event.key.code == sf::Keyboard::Equal) {
-                    scale += 0.01;
-                    scale = std::min(scale, 2.0f);
+                    model.changeRealScale(0.01);
                     SwitchScaleAction::update();
                 }
                 if (event.key.code == sf::Keyboard::Dash) {
-                    scale -= 0.01;
-                    scale = std::max(scale, 0.1f);
+                    model.changeRealScale(-0.01);
                     SwitchScaleAction::update();
                 }
             }

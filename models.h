@@ -8,7 +8,40 @@ class Model : public sf::Drawable {
     sf::Texture modelTexture;
     sf::RectangleShape modelImage;
     bool drawConvex = false;
+    int current = -1;
   public:
+    float getRealScale() {
+        return scale;
+    }
+
+    void setRealScale(const float& newScale) {
+        scale = newScale;
+    }
+
+    void changeRealScale(const float& deltaScale) {
+        scale += deltaScale;
+        if (scale < 0.1f) {
+            scale = 0.1f;
+        }
+        if (scale > 2.0f) {
+            scale = 2.0f;
+        }
+    }
+
+    void switchCurrent(int newCurrent) {
+        if (current != -1) {
+            convexes[current].setOutlineColor(sf::Color::Magenta);
+        }
+        current = newCurrent;
+        if (current != -1) {
+            convexes[current].setOutlineColor(sf::Color::Green);
+        }
+    }
+
+    int getCurrent() const {
+        return current;
+    }
+
     void setDrawConvex(bool newDrawConvex) {
         drawConvex = newDrawConvex;
     }
@@ -77,6 +110,7 @@ class Model : public sf::Drawable {
                 convexes[i].setPointCount(nm);
                 convexes[i].setFillColor(sf::Color::Transparent);
                 convexes[i].setOutlineThickness(5);
+                convexes[i].setOutlineColor(sf::Color::Magenta);
                 for (int j = 0; j < nm; ++j) {
                     float x, y;
                     fin >> x >> y;
@@ -86,7 +120,7 @@ class Model : public sf::Drawable {
         }
     }
 
-    void setScale(float scale) {
+    void setShowScale(float scale) {
         for (int i = 0; i < convexes.size(); ++i) {
             convexes[i].setScale(scale, scale);
         }
@@ -96,7 +130,12 @@ class Model : public sf::Drawable {
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
         target.draw(modelImage, states);
         for (int i = 0; i < convexes.size(); ++i) {
-            target.draw(convexes[i]);
+            if (i != current) {
+                target.draw(convexes[i]);
+            }
+        }
+        if (current != -1) {
+            target.draw(convexes[current]);
         }
     }
 };
