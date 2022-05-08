@@ -27,12 +27,12 @@ class AddAction { // Static class used as action for Add new convex button
         }
 
         setNewComment("Adding new convex");
-        model.switchCurrent(model.getConvexes().size()); // Create new empty convex and update its parameters
-        model.getConvexes().emplace_back();
+        model.getConvexes().emplace_back(); // Create new empty convex and update its parameters
         model.getConvexes().back().setScale(showScale, showScale);
         model.getConvexes().back().setFillColor(sf::Color::Transparent);
         model.getConvexes().back().setOutlineColor(sf::Color::Magenta);
         model.getConvexes().back().setOutlineThickness(5);
+        model.switchCurrent(model.getConvexes().size()); // switch Current only after emplacing. Index out of range instead
 
         toUpd -> view = makeText("Number of convexes: " + std::to_string(model.getConvexes().size())); // Update menu info
     }
