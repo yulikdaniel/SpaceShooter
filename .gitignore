@@ -2,3 +2,4 @@
 .vscode/settings.json
 sfml-app
 model_creator.o
+build
