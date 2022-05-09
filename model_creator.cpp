@@ -146,7 +146,7 @@ int main() {
     addDefaultTextButton<SaveAction>(menu, "Save", 0, 120);
     SwitchScaleAction::buttonToUpd = addDefaultTextButton<SwitchScaleAction>(menu, "Switch to real scale", 0, 160);
 
-    AddAction::toUpd = addDefaultText(menu, "Numer of convexes: " + std::to_string(model.getConvexes().size()), 0, 600);
+    AddAction::toUpd = addDefaultText(menu, "Number of convexes: " + std::to_string(model.getConvexes().size()), 0, 600);
     RemoveAction::toUpd = AddAction::toUpd;
 
     SwitchScaleAction::textToUpd = addDefaultText(menu, "", 0, 640);
