@@ -1,9 +1,11 @@
 #include "inc.h"
 
 class Model : public sf::Drawable {
-    public:
+  public:
+    // static const std::vector<std::string> partType = {"Gun", "Hull"};
+  private:
     std::string name;
-    float scale;
+    float scale, showScale;
     std::vector<sf::ConvexShape> convexes;
     sf::Texture modelTexture;
     sf::RectangleShape modelImage;
@@ -46,7 +48,7 @@ class Model : public sf::Drawable {
         drawConvex = newDrawConvex;
     }
 
-    std::vector<sf::ConvexShape>& getConvexes() {
+    const std::vector<sf::ConvexShape>& getConvexes() const {
         return convexes;
     }
 
@@ -120,11 +122,12 @@ class Model : public sf::Drawable {
         }
     }
 
-    void setShowScale(float scale) {
+    void setShowScale(float newShowScale) {
+        showScale = newShowScale;
         for (int i = 0; i < convexes.size(); ++i) {
-            convexes[i].setScale(scale, scale);
+            convexes[i].setScale(showScale, showScale);
         }
-        modelImage.setScale(scale, scale);
+        modelImage.setScale(showScale, showScale);
     }
 
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
@@ -137,5 +140,23 @@ class Model : public sf::Drawable {
         if (current != -1) {
             target.draw(convexes[current]);
         }
+    }
+
+    void addConvex() {
+        convexes.emplace_back();
+        convexes.back().setScale(showScale, showScale);
+        convexes.back().setFillColor(sf::Color::Transparent);
+        convexes.back().setOutlineThickness(5);
+        switchCurrent(convexes.size() - 1);
+    }
+
+    void removeCurrentConvex() {
+        convexes.erase(convexes.begin() + current);
+        switchCurrent(-1);
+    }
+
+    void addPointToCurrentConvex(const sf::Vector2f& point) {
+        convexes[current].setPointCount(convexes[current].getPointCount() + 1);
+        convexes[current].setPoint(convexes[current].getPointCount() - 1, point);
     }
 };

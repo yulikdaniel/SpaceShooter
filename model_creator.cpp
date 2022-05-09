@@ -27,12 +27,7 @@ class AddAction { // Static class used as action for Add new convex button
         }
 
         setNewComment("Adding new convex");
-        model.getConvexes().emplace_back(); // Create new empty convex and update its parameters
-        model.switchCurrent(model.getConvexes().size() - 1);
-        model.getConvexes().back().setScale(showScale, showScale);
-        model.getConvexes().back().setFillColor(sf::Color::Transparent);
-        model.getConvexes().back().setOutlineColor(sf::Color::Magenta);
-        model.getConvexes().back().setOutlineThickness(5);
+        model.addConvex();
 
         toUpd -> view = makeText("Number of convexes: " + std::to_string(model.getConvexes().size())); // Update menu info
     }
@@ -49,8 +44,7 @@ class RemoveAction { // Static class used as action for Remove convex button
             setNewComment("No convex chosen to erase");
         } else {
             setNewComment("Removing current convex");
-            model.getConvexes().erase(model.getConvexes().begin() + model.getCurrent());
-            model.switchCurrent(-1);
+            model.removeCurrentConvex();
         }
         toUpd -> view = makeText("Number of convexes: " + std::to_string(model.getConvexes().size())); // Update menu info
     }
@@ -171,8 +165,7 @@ int main() {
                 menu.onClick();
 
                 if (model.getCurrent() != -1 && !menu.getHighlighted() && !model.getConvexes().empty()) {
-                    model.getConvexes().back().setPointCount(model.getConvexes().back().getPointCount() + 1);
-                    model.getConvexes().back().setPoint(model.getConvexes().back().getPointCount() - 1, static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)) / showScale);
+                    model.addPointToCurrentConvex(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)) / showScale);
                 }
             }
             if (event.type == sf::Event::KeyPressed) {
