@@ -8,7 +8,7 @@ find_package(SFML 2.5 COMPONENTS
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(SpaceShooter model_creator.cpp)
+add_executable(SpaceShooter main.cpp)
 target_link_libraries(SpaceShooter sfml-graphics)
 
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
