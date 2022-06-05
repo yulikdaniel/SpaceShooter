@@ -3,3 +3,10 @@
 sfml-app
 model_creator.o
 build
+.cache/clangd/index/control.h.5D34453502BC0731.idx
+.cache/clangd/index/inc.h.8525691196A23800.idx
+.cache/clangd/index/levels.h.DFD2EC50FAFEFD03.idx
+.cache/clangd/index/main.cpp.6A8EBD99A62244BC.idx
+.cache/clangd/index/menu.h.20CA82427D36E308.idx
+.cache/clangd/index/models.h.0049EF2253A97532.idx
+.cache/clangd/index/sprites.h.C7F6B759044D3987.idx

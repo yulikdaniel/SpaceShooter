@@ -21,6 +21,18 @@ std::ostream& operator<<(std::ostream& out, const sf::Vector2u& v) {
     out << "Vector2u(" << v.x << ", " << v.y << ")";
     return out;
 }
+std::istream& operator>>(std::istream& in, sf::Vector2f& v) {
+    in >> v.x >> v.y;
+    return in;
+}
+std::istream& operator>>(std::istream& in, sf::Vector2i& v) {
+    in >> v.x >> v.y;
+    return in;
+}
+std::istream& operator>>(std::istream& in, sf::Vector2u& v) {
+    in >> v.x >> v.y;
+    return in;
+}
 
 sf::Font myfont;
 

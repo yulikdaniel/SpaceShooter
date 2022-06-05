@@ -15,21 +15,36 @@ void setNewComment(const std::string& comment) {
 
 float showScale, bigScale;
 
+class SwitchPartTypeAction {
+    static std::shared_ptr<Button<sf::Text, SwitchPartTypeAction>> toUpd;
+    friend int main();
+  public:
+    static void call() {
+        if (model.getCurrent() == -1) {
+            setNewComment("No part chosen to change type for");
+        } else {
+            model.setCurrentPartType((model.getCurrentPart().getType() + 1) % model.partTypes.size());
+            update();
+        }
+    }
+    static void update() {
+        // std::cout << ((model.getCurrent() == -1) ? -1 : model.getCurrentPart().getType()) << std::endl;
+        std::string text = (model.getCurrent() == -1) ? "none" : model.partTypes[model.getCurrentPart().getType()];
+        toUpd -> normalView = makeText(text, sf::Color::Blue);
+        toUpd -> highlightedView = makeText(text, sf::Color::Green);
+    }
+};
+
 class AddAction { // Static class used as action for Add new convex button
     static std::shared_ptr<Info<sf::Text>> toUpd;
     friend int main();
   public:
     static void call() {
-
-        if (!model.getConvexes().empty() && model.getConvexes().back().getPointCount() == 0) { // Ignore new convex creation if the current one is empty
-            setNewComment("Not adding new convex since current is empty");
-            return;
-        }
-
         setNewComment("Adding new convex");
         model.addConvex();
 
-        toUpd -> view = makeText("Number of convexes: " + std::to_string(model.getConvexes().size())); // Update menu info
+        toUpd -> view = makeText("Number of parts: " + std::to_string(model.getParts().size())); // Update menu info
+        SwitchPartTypeAction::update();
     }
 };
 
@@ -46,7 +61,8 @@ class RemoveAction { // Static class used as action for Remove convex button
             setNewComment("Removing current convex");
             model.removeCurrentConvex();
         }
-        toUpd -> view = makeText("Number of convexes: " + std::to_string(model.getConvexes().size())); // Update menu info
+        toUpd -> view = makeText("Number of parts: " + std::to_string(model.getParts().size())); // Update menu info
+        SwitchPartTypeAction::update();
     }
 };
 
@@ -102,6 +118,8 @@ bool SwitchScaleAction::currentReal;
 std::shared_ptr<Info<sf::Text>> SwitchScaleAction::textToUpd;
 std::shared_ptr<Button<sf::Text, SwitchScaleAction>> SwitchScaleAction::buttonToUpd;
 
+std::shared_ptr<Button<sf::Text, SwitchPartTypeAction>> SwitchPartTypeAction::toUpd;
+
 const int WIDTH = 1200, HEIGHT = 800;
 
 int main() {
@@ -139,8 +157,9 @@ int main() {
     addDefaultTextButton<FinishAction>(menu, "Done", 0, 80);
     addDefaultTextButton<SaveAction>(menu, "Save", 0, 120);
     SwitchScaleAction::buttonToUpd = addDefaultTextButton<SwitchScaleAction>(menu, "Switch to real scale", 0, 160);
+    SwitchPartTypeAction::toUpd = addDefaultTextButton<SwitchPartTypeAction>(menu, "none", 0, 200);
 
-    AddAction::toUpd = addDefaultText(menu, "Number of convexes: " + std::to_string(model.getConvexes().size()), 0, 600);
+    AddAction::toUpd = addDefaultText(menu, "Number of parts: " + std::to_string(model.getParts().size()), 0, 600);
     RemoveAction::toUpd = AddAction::toUpd;
 
     SwitchScaleAction::textToUpd = addDefaultText(menu, "", 0, 640);
@@ -164,7 +183,7 @@ int main() {
             if (event.type == sf::Event::MouseButtonPressed) {
                 menu.onClick();
 
-                if (model.getCurrent() != -1 && !menu.getHighlighted() && !model.getConvexes().empty()) {
+                if (model.getCurrent() != -1 && !menu.getHighlighted() && !model.getParts().empty()) {
                     model.addPointToCurrentConvex(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)) / showScale);
                 }
             }
@@ -174,7 +193,7 @@ int main() {
                         if (i == model.getCurrent()) {
                             setNewComment("Staying in convex #" + std::to_string(i));
                         } else {
-                            if (i >= model.getConvexes().size()) {
+                            if (i >= model.getParts().size()) {
                                 setNewComment("Convex index out of range");
                             } else {
                                 setNewComment("Switching to convex #" + std::to_string(i));
@@ -192,6 +211,7 @@ int main() {
                     model.changeRealScale(-0.01);
                     SwitchScaleAction::update();
                 }
+                SwitchPartTypeAction::update();
             }
         }
 
