@@ -71,39 +71,17 @@ class Menu : public sf::Drawable {
     sf::Vector2f position;
 
   public:
-    Menu(const sf::Vector2f position) : highlighted(false), position(position) {}
+    Menu(const sf::Vector2f position);
+    
+    std::shared_ptr<menuItem> addItem(menuItem * newItem);
 
-    std::shared_ptr<menuItem> addItem(menuItem * newItem) {
-        items.emplace_back(newItem);
-        return items.back();
-    }
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        states.transform.translate(position);
-        for (const auto& button : items) {
-            target.draw(*button, states);
-        }
-    }
+    void update(const sf::Vector2i& mousPos);
 
-    void update(const sf::Vector2i& mousPos) {
-        highlighted = false;
-        for (const auto& button : items) {
-            button->update(mousPos - static_cast<sf::Vector2i>(position));
-            highlighted = highlighted || button->getHighlighted();
-        }
-    }
+    void onClick();
 
-    void onClick() {
-        if (highlighted) {
-            for (const auto& button : items) {
-                button->onClick();
-            }
-        }
-    }
-
-    bool getHighlighted() {
-        return highlighted;
-    }
+    bool getHighlighted();
 };
 
 template <class Action>
@@ -111,6 +89,4 @@ std::shared_ptr<Button<sf::Text, Action>> addDefaultTextButton(Menu& menu, const
     return std::dynamic_pointer_cast<Button<sf::Text, Action>>(menu.addItem(new Button<sf::Text, Action>(makeText(str, colorNormal), makeText(str, colorHighlighted), sf::Vector2f(x, y))));
 }
 
-std::shared_ptr<Info<sf::Text>> addDefaultText(Menu& menu, const std::string& str, float x, float y, sf::Color color = sf::Color::Blue) {
-    return std::dynamic_pointer_cast<Info<sf::Text>>(menu.addItem(new Info<sf::Text>(makeText(str, color), sf::Vector2f(x, y))));
-}
+std::shared_ptr<Info<sf::Text>> addDefaultText(Menu& menu, const std::string& str, float x, float y, sf::Color color = sf::Color::Blue);
