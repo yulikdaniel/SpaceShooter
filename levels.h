@@ -1,4 +1,3 @@
-#include "models.h"
 #include "sprites.h"
 #include "control.h"
 
@@ -27,7 +26,7 @@ class Level : public sf::Drawable {
         }
     }
 
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override {\
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
         for (int i = 0; i < sprites.size(); ++i) {
             target.draw(*sprites[i], states);
         }
