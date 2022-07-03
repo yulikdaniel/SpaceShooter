@@ -42,7 +42,7 @@ bool uninitialized = true;
 void init() {
     if (uninitialized) {
         std::cerr << "Initializing...\n";
-        myfont.loadFromFile("arial.ttf");
+        myfont.loadFromFile("../arial.ttf");
         uninitialized = false;
     }
 }

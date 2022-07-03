@@ -52,7 +52,7 @@ void Model::setName(const std::string& newName) {
 }
 
 sf::Vector2u Model::loadTexture() {
-    if (!modelTexture.loadFromFile("models/" + name + "/" + name + ".png")) {
+    if (!modelTexture.loadFromFile("../models/" + name + "/" + name + ".png")) {
         std::cerr << "Error loading image from path " << "models/" + name + "/" + name + ".png" << "\n";
         exit(1);
     }
@@ -93,7 +93,7 @@ bool Model::serialize() {
 
 void Model::deserialize() {
     std::ifstream fin;
-    fin.open("models/" + name + "/" + name + ".minfo");
+    fin.open("../models/" + name + "/" + name + ".minfo");
     if (fin.is_open()) {
         std::cout << "Found existing model, reading...\n";
         std::cout.flush();
@@ -137,11 +137,11 @@ void Model::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     if (drawConvex) {
         for (int i = 0; i < parts.size(); ++i) {
             if (i != current) {
-                target.draw(parts[i].convex);
+                target.draw(parts[i].convex, states);
             }
         }
         if (current != -1) {
-            target.draw(parts[current].convex);
+            target.draw(parts[current].convex, states);
         }
     }
 }

@@ -1,4 +1,5 @@
 #include "inc.h"
+#include "convex.h"
 
 class Model : public sf::Drawable {
   public:
